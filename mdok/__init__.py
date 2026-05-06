@@ -1,0 +1,1 @@
+from mdok.mdok2_classifier import Mdok2Classifier

@@ -1,0 +1,20 @@
+Bootstrap: docker
+From:  python:3.14
+
+%files
+    steely/nltk_loader.py /nltk_loader.py
+%post
+    apt-get update
+    apt-get upgrade -y
+    apt-get install -y zstd
+    #curl -fsSL https://ollama.com/install.sh | sh
+
+    pip install --break-system-packages --upgrade pip setuptools wheel
+    pip install --break-system-packages torch torchvision --index-url https://download.pytorch.org/whl/cu128
+    pip install --break-system-packages polars seaborn pandas scikit-learn pillow networkx ranx  ftfy regex tqdm jupyterlab ipywidgets transformers sentence_transformers ollama peft datasets nltk mistral-common mistral-common[sentencepiece] trl bitsandbytes confusables trl
+    pip install --break-system-packages ultralytics==8.4.14
+    pip install opencv-python-headless
+    pip install python-dotenv
+    pip cache purge
+
+    python /nltk_loader.py

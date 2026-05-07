@@ -20,16 +20,16 @@ We use [`meta-llama/Llama-3.2-3B-instruct`](https://huggingface.co/meta-llama/Ll
 
 LoRA configuration for Mdok2: rank r=64, alpha=16, dropout=0.1, targeting query and value projections; classification head trained fully.
 
-### Fine-tuning — GRPO with LoRA
+### Fine-tuning — GRPO 
 
-We fine-tune the base model using **GRPO** (Group Relative Policy Optimization) via the [TRL](https://github.com/huggingface/trl) library, with **LoRA** adapters (rank r=32, alpha=32, dropout=0.05, targeting `q_proj` and `v_proj`).
+We fine-tune the base model using **GRPO** (Group Relative Policy Optimization) via the [TRL](https://github.com/huggingface/trl) library.
 
 The reward function is `1 − p(AI)`, where `p(AI)` is the probability assigned by Mdok2 that a generated text is AI-authored. This is not RLHF — there is no human feedback; the signal comes entirely from the classifier trained on the PAN25 dataset.
 
 Training prompts are drawn from the Voight-Kampff task datasets for **2024, 2025, and 2026**. The model is trained for 10 epochs with GRPO group size G=8.
 
 ```bash
-python -u llm_finetune_pipelineGRPO_lora_mdok_chat_beta.py \
+python -u llm_finetune_pipelineGRPO_full_mdok_chat_beta.py \
     --epochs 10 \
     --learning_rate 5e-5 \
     --checkpoint_dir ./checkpointsGRPO_full_mdok_beta005_chat \

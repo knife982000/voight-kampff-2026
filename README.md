@@ -20,7 +20,7 @@ We use [`meta-llama/Llama-3.2-3B-instruct`](https://huggingface.co/meta-llama/Ll
 
 LoRA configuration for Mdok2: rank r=64, alpha=16, dropout=0.1, targeting query and value projections; classification head trained fully.
 
-### Fine-tuning — GRPO 
+### Fine-tuning — GRPO - Full model Beta 0.05
 
 We fine-tune the base model using **GRPO** (Group Relative Policy Optimization) via the [TRL](https://github.com/huggingface/trl) library.
 
@@ -39,7 +39,29 @@ python -u llm_finetune_pipelineGRPO_full_mdok_chat_beta.py \
 ```
 
 
-Pre-trained weights are currently available at [huggingface](https://huggingface.co/jmrodri/Llama-3.2_voight-kampff_beta_005)
+Pre-trained weights are currently available at Huggingface [jmrodri/Llama-3.2_voight-kampff_beta_005](https://huggingface.co/jmrodri/Llama-3.2_voight-kampff_beta_005)
+
+### Fine-tuning — GRPO - LoRA model Beta 0.00
+
+We fine-tune the base model using **GRPO** (Group Relative Policy Optimization) via the [TRL](https://github.com/huggingface/trl) library.
+
+The reward function is `1 − p(AI)`, where `p(AI)` is the probability assigned by Mdok2 that a generated text is AI-authored. This is not RLHF — there is no human feedback; the signal comes entirely from the classifier trained on the PAN25 dataset.
+
+Training prompts are drawn from the Voight-Kampff task datasets for **2024, 2025, and 2026**. The model is trained for 10 epochs with GRPO group size G=8.
+
+```bash
+python -u llm_finetune_pipelineGRPO_lora_mdok_chat_beta.py \
+    --epochs 10 \
+    --learning_rate 5e-5 \
+    --checkpoint_dir ./checkpointsGRPO_lora_mdok_beta000_chat \
+    --output_dir ./modelGRPO_lora_mdok_beta000_chat \
+    --datasets 2024,2025,2026 \
+    --beta 0.05
+```
+
+
+Pre-trained weights are currently available at  Huggingface [jmrodri/Llama-3.2_voight-kampff_lora_beta_000](https://huggingface.co/jmrodri/Llama-3.2_voight-kampff_lora_beta_000)
+
 
 ### Inference — best-of-N generation
 
@@ -82,7 +104,8 @@ The user prompt is assembled from the task's base prompt, the `Content` field, a
 .
 ├── llm.def                                         # Singularity container definition
 ├── build.sh                                        # Script to build the Singularity container
-├── llm_finetune_pipelineGRPO_full_mdok_chat_beta010r.py  # GRPO fine-tuning pipeline
+├── llm_finetune_pipelineGRPO_full_mdok_chat_beta.py  # GRPO fine-tuning pipeline
+├── llm_finetune_pipelineGRPO_lora_mdok_chat_beta.py  # GRPO LoRAfine-tuning pipeline 
 ├── Generate_chat5.py                               # Inference with best-of-N selection
 ├── create_submission.py                            # Package outputs into a PAN zip submission
 ├── mdok/                                           # Mdok2 classifier
